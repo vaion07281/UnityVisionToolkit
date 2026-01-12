@@ -19,7 +19,28 @@ namespace UnityVisionToolkit.Runtime
         [Tooltip("The maximum size of the pool. If the pool is full, extra items will be destroyed when released.")]
         [SerializeField] private int _maxSize = 100;
 
+        [Tooltip("Debug info: Read-only")]
+        [SerializeField] private int _activeCount;
+
+        [Tooltip("Debug info: Read-only")]
+        [SerializeField] private int _inactiveCount;
+
+        [Tooltip("Debug info: Read-only")]
+        [SerializeField] private int _totalCount;
+
         private ObjectPool<GameObject> _pool;
+
+        /// <summary>
+        /// Updates the debug statistics in the Inspector.
+        /// </summary>
+        private void Update()
+        {
+            if (_pool == null) return;
+
+            _activeCount = _pool.CountActive;
+            _inactiveCount = _pool.CountInactive;
+            _totalCount = _pool.CountAll;
+        }
 
         /// <summary>
         /// Initializes the ObjectPool.

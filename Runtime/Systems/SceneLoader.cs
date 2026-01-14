@@ -30,6 +30,7 @@ namespace UnityVisionToolkit.Runtime
     public class SceneLoader : Singleton<SceneLoader>
     {
         private CanvasGroup _canvasGroup;
+        private bool _isLoading = false;
 
         /// <summary>
         /// Initializes the SceneLoader, creating the persistent overlay canvas.
@@ -82,6 +83,12 @@ namespace UnityVisionToolkit.Runtime
         /// <param name="fadeDuration">The duration of the fade in/out effect.</param>
         public void LoadScene(string sceneName, float fadeDuration = 0.5f)
         {
+            if (_isLoading)
+            {
+                Debug.LogWarning("[SceneLoader] Scene load already in progress. Ignoring request.");
+                return;
+            }
+            _isLoading = true;
             StartCoroutine(LoadSceneRoutine(sceneName, fadeDuration));
         }
 
@@ -92,6 +99,12 @@ namespace UnityVisionToolkit.Runtime
         /// <param name="fadeDuration">The duration of the fade in/out effect.</param>
         public void LoadScene(int buildIndex, float fadeDuration = 0.5f)
         {
+            if (_isLoading)
+            {
+                Debug.LogWarning("[SceneLoader] Scene load already in progress. Ignoring request.");
+                return;
+            }
+
             if (buildIndex < 0 || buildIndex >= SceneManager.sceneCountInBuildSettings)
             {
                 Debug.LogError($"[SceneLoader] Invalid build index: {buildIndex}. Must be between 0 and {SceneManager.sceneCountInBuildSettings - 1}.");
@@ -145,6 +158,8 @@ namespace UnityVisionToolkit.Runtime
 
             // Step 7: Raise Complete Event
             EventBus.Raise(new SceneLoadCompletedEvent(sceneName));
+
+            _isLoading = false;
         }
     }
 }

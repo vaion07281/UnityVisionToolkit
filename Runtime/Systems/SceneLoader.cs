@@ -85,6 +85,25 @@ namespace UnityVisionToolkit.Runtime
             StartCoroutine(LoadSceneRoutine(sceneName, fadeDuration));
         }
 
+        /// <summary>
+        /// Loads a new scene by build index with a fade transition.
+        /// </summary>
+        /// <param name="buildIndex">The build index of the scene to load.</param>
+        /// <param name="fadeDuration">The duration of the fade in/out effect.</param>
+        public void LoadScene(int buildIndex, float fadeDuration = 0.5f)
+        {
+            if (buildIndex < 0 || buildIndex >= SceneManager.sceneCountInBuildSettings)
+            {
+                Debug.LogError($"[SceneLoader] Invalid build index: {buildIndex}. Must be between 0 and {SceneManager.sceneCountInBuildSettings - 1}.");
+                return;
+            }
+
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(buildIndex);
+            string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+
+            LoadScene(sceneName, fadeDuration);
+        }
+
         private IEnumerator LoadSceneRoutine(string sceneName, float fadeDuration)
         {
             // Step 1: Raise Start Event

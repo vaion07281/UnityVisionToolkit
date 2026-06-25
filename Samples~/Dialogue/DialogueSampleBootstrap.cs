@@ -33,7 +33,7 @@ namespace UnityVisionToolkit.Samples
             graph.StartNodeId = "node_1";
 
             // Node 1: Greeting
-            var node1 = new DialogueNode
+            var node1 = new MessageNode
             {
                 NodeId = "node_1",
                 Speaker = "Villager",
@@ -50,8 +50,8 @@ namespace UnityVisionToolkit.Samples
             var eventPotion = new EventNode { NodeId = "event_potion", EventId = "give_item", Payload = "potion", NextNodeId = "node_potion_reply" };
 
             // Dialogue Nodes (Reply based on choice)
-            var replySword = new DialogueNode { NodeId = "node_sword_reply", Speaker = "Villager", Content = "A wise choice. It is dangerous to go alone!", NextNodeIds = new List<string> { "node_end" } };
-            var replyPotion = new DialogueNode { NodeId = "node_potion_reply", Speaker = "Villager", Content = "Stay safe! Drink this if you get hurt.", NextNodeIds = new List<string> { "node_end" } };
+            var replySword = new MessageNode { NodeId = "node_sword_reply", Speaker = "Villager", Content = "A wise choice. It is dangerous to go alone!", NextNodeIds = new List<string> { "node_end" } };
+            var replyPotion = new MessageNode { NodeId = "node_potion_reply", Speaker = "Villager", Content = "Stay safe! Drink this if you get hurt.", NextNodeIds = new List<string> { "node_end" } };
 
             // End Node
             var endNode = new EndNode { NodeId = "node_end" };

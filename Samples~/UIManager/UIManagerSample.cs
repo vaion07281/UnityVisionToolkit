@@ -5,16 +5,16 @@ namespace UnityVisionToolkit.Samples
 {
     public class UIPanelSample : UIPanel
     {
-        public override void Show()
+        public override void Open()
         {
-            base.Show();
-            Debug.Log("Sample Panel Shown");
+            base.Open();
+            Debug.Log("Sample Panel Opened");
         }
 
-        public override void Hide()
+        public override void Close()
         {
-            base.Hide();
-            Debug.Log("Sample Panel Hidden");
+            base.Close();
+            Debug.Log("Sample Panel Closed");
         }
     }
 
@@ -24,10 +24,12 @@ namespace UnityVisionToolkit.Samples
 
         private void Start()
         {
-            // Assuming UIManager is setup in the scene
+            // The bootstrap script now handles initial setup and interaction,
+            // but this is kept as an example of programmatic access.
             if (UIManager.Instance != null && _samplePanel != null)
             {
-                UIManager.Instance.Push(_samplePanel);
+                // Note: Using the generic Push method which is standard for UIManager
+                UIManager.Instance.Push<UIPanelSample>();
             }
         }
     }

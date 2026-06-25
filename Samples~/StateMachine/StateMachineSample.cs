@@ -3,39 +3,52 @@ using UnityVisionToolkit.Runtime;
 
 namespace UnityVisionToolkit.Samples
 {
-    public class IdleState : IState
+    public class IdleState : State<StateMachineSample>
     {
-        public void OnEnter() => Debug.Log("Entered Idle State");
-        public void OnExit() => Debug.Log("Exited Idle State");
-        public void OnUpdate() => Debug.Log("Updating Idle State");
-        public void OnFixedUpdate() {}
+        public IdleState(StateMachineSample owner, StateMachine<StateMachineSample> stateMachine) : base(owner, stateMachine) { }
+
+        public override void Enter() => Debug.Log("Entered Idle State");
+        public override void Exit() => Debug.Log("Exited Idle State");
+        public override void LogicUpdate() => Debug.Log("Updating Idle State");
     }
 
-    public class WalkState : IState
+    public class WalkState : State<StateMachineSample>
     {
-        public void OnEnter() => Debug.Log("Entered Walk State");
-        public void OnExit() => Debug.Log("Exited Walk State");
-        public void OnUpdate() => Debug.Log("Updating Walk State");
-        public void OnFixedUpdate() {}
+        public WalkState(StateMachineSample owner, StateMachine<StateMachineSample> stateMachine) : base(owner, stateMachine) { }
+
+        public override void Enter() => Debug.Log("Entered Walk State");
+        public override void Exit() => Debug.Log("Exited Walk State");
+        public override void LogicUpdate() => Debug.Log("Updating Walk State");
     }
 
     public class StateMachineSample : MonoBehaviour
     {
-        private StateMachine _stateMachine;
+        public StateMachine<StateMachineSample> StateMachine { get; private set; }
 
         private void Start()
         {
-            _stateMachine = new StateMachine();
-            _stateMachine.ChangeState(new IdleState());
+            StateMachine = new StateMachine<StateMachineSample>();
+            StateMachine.Initialize(new IdleState(this, StateMachine));
         }
 
         private void Update()
         {
-            _stateMachine.Update();
+            StateMachine?.OnUpdate();
+        }
 
-            if (Input.GetKeyDown(KeyCode.Space))
+        public void SwitchToWalk()
+        {
+            if (StateMachine != null)
             {
-                _stateMachine.ChangeState(new WalkState());
+                StateMachine.ChangeState(new WalkState(this, StateMachine));
+            }
+        }
+
+        public void SwitchToIdle()
+        {
+            if (StateMachine != null)
+            {
+                StateMachine.ChangeState(new IdleState(this, StateMachine));
             }
         }
     }

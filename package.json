@@ -14,5 +14,27 @@
     "singleton",
     "patterns"
   ],
-  "dependencies": {}
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "EventBus",
+      "description": "Demonstrates how to use the EventBus.",
+      "path": "Samples~/EventBus"
+    },
+    {
+      "displayName": "StateMachine",
+      "description": "Demonstrates how to use the StateMachine.",
+      "path": "Samples~/StateMachine"
+    },
+    {
+      "displayName": "UIManager",
+      "description": "Demonstrates how to use the UIManager.",
+      "path": "Samples~/UIManager"
+    },
+    {
+      "displayName": "ObjectPool",
+      "description": "Demonstrates how to use the ObjectPool.",
+      "path": "Samples~/ObjectPool"
+    }
+  ]
 }

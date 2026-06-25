@@ -35,6 +35,11 @@
       "displayName": "ObjectPool",
       "description": "Demonstrates how to use the ObjectPool.",
       "path": "Samples~/ObjectPool"
+    },
+    {
+      "displayName": "Dialogue",
+      "description": "Demonstrates how to use the Dialogue Framework.",
+      "path": "Samples~/Dialogue"
     }
   ]
 }

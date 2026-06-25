@@ -105,7 +105,7 @@ namespace UnityVisionToolkit.Samples
             Debug.Log("<color=cyan>Press [SPACE] to restart dialogue.</color>");
         }
 
-        private void OnNodeEntered(DialogueNode node)
+        private void OnNodeEntered(MessageNode node)
         {
             _currentChoices = null;
             _awaitingInput = true;

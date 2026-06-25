@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TestTools;
 using UnityVisionToolkit.Runtime;
 
 namespace UnityVisionToolkit.Tests.Runtime
@@ -38,7 +39,7 @@ namespace UnityVisionToolkit.Tests.Runtime
         {
             var graph = ScriptableObject.CreateInstance<DialogueGraph>();
             graph.StartNodeId = "node_1";
-            var node1 = new DialogueNode { NodeId = "node_1", Content = "Hello" };
+            var node1 = new MessageNode { NodeId = "node_1", Content = "Hello" };
             graph.Nodes.Add(node1);
 
             bool startedEventFired = false;
@@ -63,8 +64,8 @@ namespace UnityVisionToolkit.Tests.Runtime
             var graph = ScriptableObject.CreateInstance<DialogueGraph>();
             graph.StartNodeId = "node_1";
 
-            var node1 = new DialogueNode { NodeId = "node_1", NextNodeIds = new List<string> { "node_2" } };
-            var node2 = new DialogueNode { NodeId = "node_2" };
+            var node1 = new MessageNode { NodeId = "node_1", NextNodeIds = new List<string> { "node_2" } };
+            var node2 = new MessageNode { NodeId = "node_2" };
 
             graph.Nodes.Add(node1);
             graph.Nodes.Add(node2);
@@ -93,8 +94,8 @@ namespace UnityVisionToolkit.Tests.Runtime
                 FalseNodeId = "node_false"
             };
 
-            var nodeTrue = new DialogueNode { NodeId = "node_true" };
-            var nodeFalse = new DialogueNode { NodeId = "node_false" };
+            var nodeTrue = new MessageNode { NodeId = "node_true" };
+            var nodeFalse = new MessageNode { NodeId = "node_false" };
 
             graph.Nodes.Add(condNode);
             graph.Nodes.Add(nodeTrue);
@@ -127,7 +128,7 @@ namespace UnityVisionToolkit.Tests.Runtime
                 Payload = "sword",
                 NextNodeId = "node_1"
             };
-            var node1 = new DialogueNode { NodeId = "node_1" };
+            var node1 = new MessageNode { NodeId = "node_1" };
 
             graph.Nodes.Add(eventNode);
             graph.Nodes.Add(node1);
@@ -154,7 +155,7 @@ namespace UnityVisionToolkit.Tests.Runtime
             var graph = ScriptableObject.CreateInstance<DialogueGraph>();
             graph.StartNodeId = "node_start";
 
-            var startNode = new DialogueNode
+            var startNode = new MessageNode
             {
                 NodeId = "node_start",
                 NextNodeIds = new List<string> { "choice_1", "choice_2" }
@@ -213,9 +214,9 @@ namespace UnityVisionToolkit.Tests.Runtime
             var graph = ScriptableObject.CreateInstance<DialogueGraph>();
             graph.StartNodeId = "node_1";
 
-            var node1 = new DialogueNode { NodeId = "node_1", NextNodeIds = new List<string> { "choice_1" } };
+            var node1 = new MessageNode { NodeId = "node_1", NextNodeIds = new List<string> { "choice_1" } };
             var choice1 = new ChoiceNode { NodeId = "choice_1", NextNodeId = "node_2" };
-            var node2 = new DialogueNode { NodeId = "node_2" };
+            var node2 = new MessageNode { NodeId = "node_2" };
 
             graph.Nodes.Add(node1);
             graph.Nodes.Add(choice1);
@@ -230,6 +231,71 @@ namespace UnityVisionToolkit.Tests.Runtime
             Assert.IsNotNull(presentedChoices);
             Assert.AreEqual(1, presentedChoices.Count);
             Assert.AreEqual("choice_1", presentedChoices[0].NodeId);
+        }
+
+        [Test]
+        public void DialogueSession_GetState_ReturnsCurrentNodeId()
+        {
+            var graph = ScriptableObject.CreateInstance<DialogueGraph>();
+            graph.StartNodeId = "node_1";
+            var node1 = new MessageNode { NodeId = "node_1", Content = "Hello" };
+            graph.Nodes.Add(node1);
+
+            _manager.StartDialogue(graph);
+
+            var state = _manager.GetState();
+            Assert.IsNotNull(state);
+            Assert.AreEqual("node_1", state.CurrentNodeId);
+        }
+
+        [Test]
+        public void DialogueGraph_DuplicateNodeId_LogsWarningAndUsesFirst()
+        {
+            var graph = ScriptableObject.CreateInstance<DialogueGraph>();
+            graph.StartNodeId = "node_1";
+            var node1 = new MessageNode { NodeId = "node_1", Content = "First" };
+            var node2 = new MessageNode { NodeId = "node_1", Content = "Second (Duplicate)" };
+
+            graph.Nodes.Add(node1);
+            graph.Nodes.Add(node2);
+
+            LogAssert.Expect(LogType.Warning, "[DialogueGraph] Duplicate NodeId found: 'node_1'. Only the first one will be accessible.");
+
+            graph.InitializeCache();
+            var resolvedNode = graph.GetNode("node_1") as MessageNode;
+
+            Assert.IsNotNull(resolvedNode);
+            Assert.AreEqual("First", resolvedNode.Content);
+        }
+
+        [Test]
+        public void DialogueSession_MissingNode_EndsDialogueAndLogsWarning()
+        {
+            var graph = ScriptableObject.CreateInstance<DialogueGraph>();
+            graph.StartNodeId = "missing_node";
+
+            LogAssert.Expect(LogType.Warning, "[DialogueSession] Node ID 'missing_node' not found. Ending dialogue.");
+
+            _manager.StartDialogue(graph);
+
+            Assert.IsFalse(_manager.IsPlaying);
+        }
+
+        [Test]
+        public void NodeProcessorRegistry_MissingProcessor_LogsError()
+        {
+            var registry = new NodeProcessorRegistry();
+            // Do not register any processor
+            var session = new DialogueSession(registry);
+
+            var graph = ScriptableObject.CreateInstance<DialogueGraph>();
+            graph.StartNodeId = "node_1";
+            var node1 = new MessageNode { NodeId = "node_1" };
+            graph.Nodes.Add(node1);
+
+            LogAssert.Expect(LogType.Error, "[DialogueSession] No processor found for node type: MessageNode");
+
+            session.StartDialogue(graph);
         }
     }
 }
